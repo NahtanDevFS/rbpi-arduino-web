@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import "./App.css";
 
 function App() {
   const [sensorData, setSensorData] = useState({
@@ -27,14 +28,14 @@ function App() {
         setIsApiConnected(false);
       }
     } catch (error) {
-      console.error("Error trayendo datos de sensores:", error);
+      console.error("Error error trayendo datos del sensor:", error);
       setIsApiConnected(false);
     }
   };
 
   useEffect(() => {
     fetchSensorData();
-    const interval = setInterval(fetchSensorData, 1500);
+    const interval = setInterval(fetchSensorData, 3000);
     return () => clearInterval(interval);
   }, []);
 
@@ -49,12 +50,28 @@ function App() {
         setLedStatus(state);
       }
     } catch (error) {
-      console.error(`Error encendiendo LED ${state}:`, error);
+      console.error(`Error encendiendo led ${state}:`, error);
     }
+  };
+
+  const handleToggleLed = () => {
+    const newState = ledStatus === "on" ? "off" : "on";
+    handleLedControl(newState);
   };
 
   const handleLcdSubmit = async (e) => {
     e.preventDefault();
+
+    //Expresión regular para detectar fuera del rango ASCII básico
+    const invalidCharRegex = /[^\x00-\x7F]/;
+
+    if (invalidCharRegex.test(lcdLine1) || invalidCharRegex.test(lcdLine2)) {
+      alert(
+        "El texto contiene caracteres no permitidos (como tildes o 'ñ').\nUsa solo caracteres básicos"
+      );
+      return;
+    }
+
     try {
       await fetch(`${API_BASE_URL}/lcd`, {
         method: "POST",
@@ -62,27 +79,9 @@ function App() {
         body: JSON.stringify({ line1: lcdLine1, line2: lcdLine2 }),
       });
     } catch (error) {
-      console.error("Error escribiendo en LCD:", error);
+      console.error("Error escribiendo en la LCD:", error);
     }
   };
-
-  const sanitizeText = (text) => {
-    let sanitized = text.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-    sanitized = sanitized.replace(
-      /[^a-zA-Z0-9 \.,\?!@#\$%\^&\*\(\)_\+\-=\[\]\{\};:'"\\\|`~<>]/g,
-      ""
-    );
-    return sanitized;
-  };
-
-  const handleLine1Change = (e) => {
-    setLcdLine1(sanitizeText(e.target.value));
-  };
-
-  const handleLine2Change = (e) => {
-    setLcdLine2(sanitizeText(e.target.value));
-  };
-
   return (
     <div className="app-container">
       <header>
@@ -119,17 +118,8 @@ function App() {
             </span>
           </p>
           <div className="button-group">
-            <button
-              onClick={() => handleLedControl("on")}
-              disabled={!isApiConnected}
-            >
-              Encender
-            </button>
-            <button
-              onClick={() => handleLedControl("off")}
-              disabled={!isApiConnected}
-            >
-              Apagar
+            <button onClick={handleToggleLed} disabled={!isApiConnected}>
+              {ledStatus === "on" ? "Apagar" : "Encender"}
             </button>
           </div>
         </div>
@@ -140,7 +130,7 @@ function App() {
             <input
               type="text"
               value={lcdLine1}
-              onChange={handleLine1Change}
+              onChange={(e) => setLcdLine1(e.target.value)}
               placeholder="Linea 1"
               maxLength="16"
               disabled={!isApiConnected}
@@ -148,7 +138,7 @@ function App() {
             <input
               type="text"
               value={lcdLine2}
-              onChange={handleLine2Change}
+              onChange={(e) => setLcdLine2(e.target.value)}
               placeholder="Linea 2"
               maxLength="16"
               disabled={!isApiConnected}
