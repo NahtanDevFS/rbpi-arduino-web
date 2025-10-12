@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import "./App.css";
 
 function App() {
   const [sensorData, setSensorData] = useState({
@@ -28,14 +27,14 @@ function App() {
         setIsApiConnected(false);
       }
     } catch (error) {
-      console.error("Error fetching sensor data:", error);
+      console.error("Error trayendo datos de sensores:", error);
       setIsApiConnected(false);
     }
   };
 
   useEffect(() => {
     fetchSensorData();
-    const interval = setInterval(fetchSensorData, 3000);
+    const interval = setInterval(fetchSensorData, 1500);
     return () => clearInterval(interval);
   }, []);
 
@@ -50,7 +49,7 @@ function App() {
         setLedStatus(state);
       }
     } catch (error) {
-      console.error(`Error turning led ${state}:`, error);
+      console.error(`Error encendiendo LED ${state}:`, error);
     }
   };
 
@@ -63,9 +62,27 @@ function App() {
         body: JSON.stringify({ line1: lcdLine1, line2: lcdLine2 }),
       });
     } catch (error) {
-      console.error("Error writing to LCD:", error);
+      console.error("Error escribiendo en LCD:", error);
     }
   };
+
+  const sanitizeText = (text) => {
+    let sanitized = text.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    sanitized = sanitized.replace(
+      /[^a-zA-Z0-9 \.,\?!@#\$%\^&\*\(\)_\+\-=\[\]\{\};:'"\\\|`~<>]/g,
+      ""
+    );
+    return sanitized;
+  };
+
+  const handleLine1Change = (e) => {
+    setLcdLine1(sanitizeText(e.target.value));
+  };
+
+  const handleLine2Change = (e) => {
+    setLcdLine2(sanitizeText(e.target.value));
+  };
+
   return (
     <div className="app-container">
       <header>
@@ -123,7 +140,7 @@ function App() {
             <input
               type="text"
               value={lcdLine1}
-              onChange={(e) => setLcdLine1(e.target.value)}
+              onChange={handleLine1Change}
               placeholder="Linea 1"
               maxLength="16"
               disabled={!isApiConnected}
@@ -131,7 +148,7 @@ function App() {
             <input
               type="text"
               value={lcdLine2}
-              onChange={(e) => setLcdLine2(e.target.value)}
+              onChange={handleLine2Change}
               placeholder="Linea 2"
               maxLength="16"
               disabled={!isApiConnected}
