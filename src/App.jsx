@@ -35,7 +35,7 @@ function App() {
 
   useEffect(() => {
     fetchSensorData();
-    const interval = setInterval(fetchSensorData, 3000);
+    const interval = setInterval(fetchSensorData, 1500);
     return () => clearInterval(interval);
   }, []);
 
