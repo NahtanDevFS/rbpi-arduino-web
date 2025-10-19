@@ -105,7 +105,7 @@ function App() {
         <div className="status-row">
           <span className="status-label">Sensor Laser vl53l0x:</span>
           <span className="distance-value">
-            {sensorData.laser / 10 ?? "---"} cm
+            {sensorData.laser == null ? "---" : sensorData.laser / 10} cm
           </span>
         </div>
       </div>
