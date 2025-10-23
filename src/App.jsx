@@ -10,6 +10,7 @@ function App() {
   const [lcdLine2, setLcdLine2] = useState("");
   const [ledStatus, setLedStatus] = useState("off");
   const [isApiConnected, setIsApiConnected] = useState(false);
+  const [isBlinking, setIsBlinking] = useState(false);
 
   const API_BASE_URL = "https://topologic-quarrelingly-terri.ngrok-free.app";
 
@@ -59,16 +60,40 @@ function App() {
     handleLedControl(newState);
   };
 
+  useEffect(() => {
+    let intervalId = null;
+
+    if (isBlinking) {
+      intervalId = setInterval(() => {
+        setLedStatus((currentStatus) => {
+          const newState = currentStatus === "on" ? "off" : "on";
+
+          handleLedControl(newState);
+
+          return currentStatus;
+        });
+      }, 1000);
+    }
+
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+        handleLedControl("off");
+      }
+    };
+  }, [isBlinking]);
+
+  const handleToggleBlinking = () => {
+    setIsBlinking(!isBlinking);
+  };
+
   const handleLcdSubmit = async (e) => {
     e.preventDefault();
 
-    //Expresión regular para detectar fuera del rango ASCII básico
     const invalidCharRegex = /[^\x00-\x7F]/;
 
     if (invalidCharRegex.test(lcdLine1) || invalidCharRegex.test(lcdLine2)) {
-      alert(
-        "El texto contiene caracteres no permitidos (como tildes o 'ñ').\nUsa solo caracteres básicos"
-      );
+      console.warn("Caracteres no permitidos. Reemplazando alert.");
       return;
     }
 
@@ -118,12 +143,22 @@ function App() {
           <p>
             Estado:{" "}
             <span className={ledStatus === "on" ? "connected" : "disconnected"}>
-              {ledStatus.toUpperCase()}
+              {/* Cambiamos el texto si está en modo intermitente */}
+              {isBlinking ? "MODO INTERMITENTE" : ledStatus.toUpperCase()}
             </span>
           </p>
           <div className="button-group">
-            <button onClick={handleToggleLed} disabled={!isApiConnected}>
+            {/* Botón original: se deshabilita si está en modo intermitente */}
+            <button
+              onClick={handleToggleLed}
+              disabled={!isApiConnected || isBlinking}
+            >
               {ledStatus === "on" ? "Apagar" : "Encender"}
+            </button>
+
+            {/* Nuevo botón para modo intermitente */}
+            <button onClick={handleToggleBlinking} disabled={!isApiConnected}>
+              {isBlinking ? "Detener Intermitencia" : "Modo Intermitente"}
             </button>
           </div>
         </div>
