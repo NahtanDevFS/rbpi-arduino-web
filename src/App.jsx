@@ -67,9 +67,7 @@ function App() {
       intervalId = setInterval(() => {
         setLedStatus((currentStatus) => {
           const newState = currentStatus === "on" ? "off" : "on";
-
           handleLedControl(newState);
-
           return currentStatus;
         });
       }, 1000);
@@ -93,7 +91,9 @@ function App() {
     const invalidCharRegex = /[^\x00-\x7F]/;
 
     if (invalidCharRegex.test(lcdLine1) || invalidCharRegex.test(lcdLine2)) {
-      console.warn("Caracteres no permitidos. Reemplazando alert.");
+      alert(
+        "El texto contiene caracteres no permitidos (como tildes o 'ñ').\nUsa solo caracteres básicos"
+      );
       return;
     }
 
@@ -123,16 +123,25 @@ function App() {
             {isApiConnected ? "CONECTADO" : "DESCONECTADO"}
           </span>
         </div>
+
         <div className="status-row">
           <span className="status-label">Sensor Ultrasonico HC-SR04:</span>
           <span className="distance-value">
-            {sensorData.ultrasonico ?? "---"} cm
+            <span className="distance-number">
+              {sensorData.ultrasonico ?? "---"}
+            </span>
+            <span className="distance-unit">cm</span>
           </span>
         </div>
         <div className="status-row">
           <span className="status-label">Sensor Laser vl53l0x:</span>
           <span className="distance-value">
-            {sensorData.laser == null ? "---" : sensorData.laser / 10} cm
+            <span className="distance-number">
+              {sensorData.laser == null
+                ? "---"
+                : (sensorData.laser / 10).toFixed(1)}
+            </span>
+            <span className="distance-unit">cm</span>
           </span>
         </div>
       </div>
@@ -143,20 +152,16 @@ function App() {
           <p>
             Estado:{" "}
             <span className={ledStatus === "on" ? "connected" : "disconnected"}>
-              {/* Cambiamos el texto si está en modo intermitente */}
               {isBlinking ? "MODO INTERMITENTE" : ledStatus.toUpperCase()}
             </span>
           </p>
           <div className="button-group">
-            {/* Botón original: se deshabilita si está en modo intermitente */}
             <button
               onClick={handleToggleLed}
               disabled={!isApiConnected || isBlinking}
             >
               {ledStatus === "on" ? "Apagar" : "Encender"}
             </button>
-
-            {/* Nuevo botón para modo intermitente */}
             <button onClick={handleToggleBlinking} disabled={!isApiConnected}>
               {isBlinking ? "Detener Intermitencia" : "Modo Intermitente"}
             </button>

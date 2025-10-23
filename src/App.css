@@ -1,3 +1,7 @@
+* {
+  box-sizing: border-box;
+}
+
 body {
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   margin: 0;
@@ -58,7 +62,7 @@ h2 {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 12px;
+  margin-bottom: 25px;
   font-size: 1.1rem;
 }
 
@@ -83,10 +87,30 @@ h2 {
 }
 
 .distance-value {
+  display: inline-flex;
+  align-items: baseline;
+  background-color: #202020;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #444;
   font-family: "Courier New", Courier, monospace;
-  font-size: 1.2rem;
+  min-width: 90px;
+  justify-content: flex-end;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.distance-number {
+  font-size: 1.75rem;
   font-weight: bold;
   color: #6cb6ff;
+  line-height: 1;
+  margin-right: 6px;
+}
+
+.distance-unit {
+  font-size: 0.9rem;
+  color: #a0a0a0;
+  font-weight: bold;
 }
 
 .controls-grid {
@@ -166,6 +190,9 @@ button {
   font-size: 1rem;
   font-weight: bold;
   transition: background-color 0.3s, transform 0.2s;
+
+  min-width: 190px;
+  text-align: center;
 }
 
 button:hover:not(:disabled) {
@@ -176,4 +203,25 @@ button:hover:not(:disabled) {
 button:disabled {
   background-color: #4e5657;
   cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  .app-container {
+    padding: 15px 10px;
+  }
+
+  .status-panel {
+    padding: 10px;
+  }
+  .button-group {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: auto;
+    flex-direction: column;
+  }
+  button {
+    min-width: 150px;
+    text-align: center;
+  }
 }
