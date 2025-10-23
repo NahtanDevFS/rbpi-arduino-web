@@ -85,8 +85,10 @@ function App() {
   return (
     <div className="app-container">
       <header>
-        <h1>Panel de Control de Dispositivos</h1>
+        <h1>Fase 3 - proyecto</h1>
         <p className="subtitle">Raspberry Pi + Arduino</p>
+        <p className="subtitle">Jonathan Franco 1190-22-515</p>
+        <p className="subtitle">Mánleo Chacón 1190-22-7368</p>
       </header>
 
       <div className="status-panel">
